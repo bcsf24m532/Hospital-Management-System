@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Patient Dashboard - AKS Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@300;400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <style>
+        /* ===========================
+           AKS Hospital — Premium Theme
+           =========================== */
+        :root {
+            --navy: #1a3236; 
+            --teal: #2d7a75; 
+            --teal-dark: #1f5c58;
+            --gold: #c5a059;
+            
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --bg-sidebar: linear-gradient(170deg, #122123 0%, #1e4d4a 100%);
+            --bg-card: #ffffff;
+            
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Source Serif 4', serif;
+            --font-sans: 'Roboto', sans-serif;
+            
+            --text-main: #263238;
+            --text-muted: #546e7a;
+            --danger: #c62828;
+
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+            --shadow-hover: 0 15px 35px rgba(0,0,0,0.1);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #eceff1; }
+        ::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--teal-dark); }
+
+        body {
+            font-family: var(--font-body);
+            background: #f0f2f5;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            width: 100%;
+            overflow: hidden; 
+        }
+
+        /* --- CINEMATIC LOADER --- */
+        #globalLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #152022; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        
+        .aks-logo-text { font-family: var(--font-head); font-size: 5rem; font-weight: 700; color: #fff; display: flex; gap: 15px; }
+        .aks-logo-text span { opacity: 0; filter: blur(10px); animation: cinematicReveal 1s forwards; }
+        .aks-logo-text span:nth-child(2) { animation-delay: 0.2s; color: var(--teal); }
+        .aks-logo-text span:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* ADDED: Golden Line Animation */
+        .loader-line {
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            margin-top: 10px;
+            animation: lineExpand 1.5s ease forwards 0.6s;
+        }
+
+        @keyframes cinematicReveal { to { opacity: 1; filter: blur(0); } }
+        @keyframes lineExpand { to { width: 120px; } }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: #fff;
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.05);
+            z-index: 100; flex-shrink: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .brand {
+            font-family: var(--font-head); 
+            font-size: 1.8rem; 
+            font-weight: 700;
+            padding: 35px 25px;
+            display: flex; align-items: center; gap: 12px; color: #fff; 
+        }
+
+        .nav {
+            flex: 1; overflow-y: auto; padding: 10px 20px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .nav-heading {
+            font-size: 0.7rem; color: #80cbc4; text-transform: uppercase;
+            letter-spacing: 1.5px; margin: 25px 0 10px 10px; font-weight: 700;
+            font-family: var(--font-sans); opacity: 0.8;
+        }
+
+        .nav a {
+            display: flex; align-items: center; gap: 14px; 
+            padding: 16px 20px; border-radius: 12px; cursor: pointer; 
+            color: rgba(255,255,255,0.75); text-decoration: none; 
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-family: var(--font-sans); font-size: 0.95rem; font-weight: 500;
+        }
+
+        .nav a:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateX(5px); }
+        .nav a.active { background: #f0f4f4; color: var(--teal-dark); font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .nav a.logout-item { color: #ef9a9a; margin-top: auto; margin-bottom: 20px; }
+        .nav a.logout-item:hover { background: rgba(198, 40, 40, 0.2); color: #ffcdd2; }
+
+        /* --- MAIN CONTENT --- */
+        .main {
+            flex: 1; padding: 40px; overflow-y: auto;
+            position: relative; background: #f4f6f8; height: 100vh;
+        }
+
+        /* --- HEADER LAYOUT --- */
+        .header-container {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 40px; background: #fff; padding: 25px 30px;
+            border-radius: var(--radius); box-shadow: var(--shadow-soft);
+        }
+
+        .header-text h1 {
+            font-family: var(--font-head); font-size: 2.4rem; font-weight: 700;
+            color: var(--navy); margin-bottom: 5px; line-height: 1.1;
+        }
+
+        .last-login {
+            color: var(--text-muted); font-size: 0.9rem; font-family: var(--font-sans);
+            font-weight: 400; display: flex; align-items: center; gap: 5px;
+        }
+
+        .profile-area { display: flex; align-items: center; gap: 15px; }
+        
+        .profile-pic {
+            width: 55px; height: 55px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--teal); box-shadow: 0 4px 10px rgba(45, 122, 117, 0.2);
+        }
+
+        /* --- CAROUSEL --- */
+        .health-carousel {
+            position: relative; width: 100%; height: 280px; 
+            background: var(--bg-card); border-radius: var(--radius);
+            margin-bottom: 35px; overflow: hidden; box-shadow: var(--shadow-soft);
+        }
+        .slide {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start; 
+            padding: 0 80px; opacity: 0; transition: opacity 1.0s ease-in-out;
+            background-size: cover; background-position: center;
+        }
+        .slide::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0) 100%);
+            z-index: 1;
+        }
+        .slide.active { opacity: 1; }
+        .slide h2, .slide p { position: relative; z-index: 2; }
+        .slide h2 { font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; color: var(--navy); }
+        .slide p { font-family: var(--font-sans); font-size: 1rem; color: var(--text-main); max-width: 450px; line-height: 1.6; }
+
+        /* --- STATS CARDS --- */
+        .stats { display: flex; gap: 25px; margin-bottom: 35px; flex-wrap: wrap; }
+        .card {
+            background: #fff; padding: 30px; border-radius: var(--radius);
+            box-shadow: var(--shadow-soft); flex: 1; min-width: 220px;
+            border-left: 5px solid var(--teal); position: relative; overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
+        .card h3 {
+            font-family: var(--font-sans); font-size: 0.9rem; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; font-weight: 700;
+        }
+        .card p {
+            font-size: 2.8rem; color: var(--navy); font-family: var(--font-head);
+            font-weight: 700; margin: 0; line-height: 1;
+        }
+        .card .icon-bg {
+            position: absolute; right: -10px; bottom: -10px; font-size: 80px;
+            color: rgba(0,0,0,0.03); pointer-events: none;
+        }
+
+        /* --- WIDGET GRID --- */
+        .dashboard-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .widget-box {
+            background: #fff; border-radius: var(--radius); padding: 30px;
+            box-shadow: var(--shadow-soft); border: none; transition: box-shadow 0.3s;
+        }
+        .widget-box:hover { box-shadow: var(--shadow-hover); }
+        .widget-header {
+            font-family: var(--font-head); font-size: 1.4rem; font-weight: 700;
+            color: var(--navy); margin-bottom: 25px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #f4f6f8; padding-bottom: 15px;
+        }
+
+        .appt-item, .alert-item {
+            display: flex; align-items: center; gap: 20px;
+            padding: 18px; border-radius: 12px; margin-bottom: 10px;
+            background: #f8f9fa; border: 1px solid transparent; transition: all 0.2s;
+        }
+        .appt-item:hover, .alert-item:hover { background: #fff; border-color: var(--teal); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        .date-badge {
+            background: #fff; color: var(--teal); border: 1px solid var(--teal);
+            padding: 10px 15px; border-radius: 10px; text-align: center; min-width: 70px;
+        }
+        .date-badge span { display: block; font-size: 1.4rem; font-family: var(--font-head); font-weight: 700; line-height: 1; }
+        .date-badge small { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; font-family: var(--font-sans); }
+
+        /* --- SECTIONS --- */
+        .section { display: none; animation: fadeIn 0.4s ease-out; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-family: var(--font-head); font-size: 1.8rem; color: var(--navy); margin-bottom: 25px; font-weight: 700; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: -10px; }
+        th { 
+            text-align: left; padding: 15px 20px; color: var(--text-muted); 
+            font-size: 0.85rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;
+        }
+        td { 
+            padding: 20px; background: #fff; font-size: 1rem; 
+            border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;
+        }
+        tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-left: 1px solid #f0f0f0; }
+        tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-right: 1px solid #f0f0f0; }
+        tr:hover td { background: #fafafa; transform: translateY(-2px); transition: transform 0.2s; border-color: var(--teal); }
+
+        .btn {
+            background: var(--teal); color: #fff; border: none; padding: 10px 20px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; text-transform: uppercase;
+            font-size: 0.8rem; letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(45, 122, 117, 0.3); transition: all 0.2s;
+            text-decoration: none; display: inline-block;
+        }
+        .btn:hover { background: var(--teal-dark); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(45, 122, 117, 0.4); }
+
+        /* Status Colors */
+        .bill-status-Pending { color: var(--gold); font-weight: bold; }
+        .bill-status-Paid { color: var(--teal); font-weight: bold; }
+        .bill-status-Canceled { color: var(--danger); font-weight: bold; }
+        .status-Booked, .status-Approved { color: var(--teal); font-weight: 700; }
+        .status-Pending { color: var(--gold); font-weight: 700; }
+        .status-Cancelled { color: var(--danger); font-weight: 700; }
+        .status-Completed { color: var(--navy); font-weight: 700; }
+
+        @media(max-width: 1000px) {
+            .sidebar { display: none; }
+            body { flex-direction: column; overflow-y: auto; }
+            .main { padding: 20px; height: auto; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .header-container { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .profile-area { width: 100%; justify-content: flex-start; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="globalLoader">
+        <div class="aks-logo-text"><span>A</span><span>K</span><span>S</span></div>
+        <div class="loader-line"></div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <span class="material-symbols-outlined" style="font-size:36px; color:#4db6ac">local_hospital</span>
+            AKS Hospital
+        </div>
+        <nav class="nav">
+            <div class="nav-heading">Main Menu</div>
+            <a id="nav-dashboard" class="active" onclick="show('dashboard')">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+            <a id="nav-previousAppointments" onclick="show('previousAppointments')">
+                <span class="material-symbols-outlined">history</span> Appointments
+            </a>
+            <a id="nav-notifications" onclick="show('notifications')">
+                <span class="material-symbols-outlined">notifications</span> Notifications <span id="notifBadge" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:10px;font-size:0.7rem;margin-left:auto;display:none;font-weight:bold;">0</span>
+            </a>
+            
+            <div class="nav-heading">Medical Records</div>
+            <a id="nav-prescriptions" onclick="show('prescriptions')">
+                <span class="material-symbols-outlined">prescriptions</span> Prescriptions
+            </a>
+            <a id="nav-labreports" onclick="show('labReports')">
+                <span class="material-symbols-outlined">biotech</span> Lab Reports
+            </a>
+            
+            <div class="nav-heading">Finance</div>
+            <a id="nav-billing" onclick="show('billing')">
+                <span class="material-symbols-outlined">payments</span> Billing
+            </a>
+
+            <div class="nav-heading">Actions</div>
+            <a href="appointments.html">
+                <span class="material-symbols-outlined">add_circle</span> Book New
+            </a>
+
+            <a id="logoutBtn" class="logout-item">
+                <span class="material-symbols-outlined">logout</span> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main">
+        
+        <div class="header-container">
+            <div class="header-text">
+                <h1 id="welcomeTitle">Welcome, Patient</h1>
+                <p class="last-login">
+                    <span class="material-symbols-outlined" style="font-size:16px; color:var(--teal)">schedule</span>
+                    Last logged in: Today, 9:41 AM
+                </p>
+            </div>
+            <div class="profile-area">
+                <img src="" alt="Profile" class="profile-pic" id="profilePic">
+            </div>
+        </div>
+
+        <section id="dashboard" class="section active">
+            
+            <div class="health-carousel">
+                <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2670&auto=format&fit=crop');">
+                    <h2>Move 30 Minutes Today</h2>
+                    <p>Regular exercise boosts mood and improves cardiac health. Even a brisk walk makes a difference.</p>
+                </div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1551076805-e1869033e561?q=80&w=2670&auto=format&fit=crop');">
+                    <h2>Stay Hydrated</h2>
+                    <p>Water intake is essential for energy levels and cognitive function. Aim for eight glasses daily.</p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="card">
+                    <span class="material-symbols-outlined icon-bg">event_available</span>
+                    <h3>Total Visits</h3>
+                    <p id="totalAppointments">0</p>
+                </div>
+                <div class="card" style="border-left-color: var(--gold);">
+                    <span class="material-symbols-outlined icon-bg">notifications_active</span>
+                    <h3>New Alerts</h3>
+                    <p id="alertsCount" style="color:var(--gold)">0</p>
+                </div>
+                <div class="card" style="border-left-color: var(--navy);">
+                    <span class="material-symbols-outlined icon-bg">calendar_month</span>
+                    <h3>Next Visit</h3>
+                    <p id="nextAppointment" style="font-size:1.4rem; margin-top:15px; line-height:1.2">No upcoming</p>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="widget-box">
+                    <div class="widget-header">
+                        Upcoming Schedule
+                        <span class="material-symbols-outlined" style="color:var(--teal)">calendar_today</span>
+                    </div>
+                    <div id="upcomingWidget">
+                        <p style="color:#aaa; padding:10px;">Loading schedule...</p>
+                    </div>
+                </div>
+
+                <div class="widget-box">
+                    <div class="widget-header">
+                        Recent Notifications
+                        <span class="material-symbols-outlined" style="color:var(--danger)">notifications</span>
+                    </div>
+                    <div id="alertsWidget">
+                         <p style="color:#aaa; padding:10px;">No new alerts.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="previousAppointments" class="section">
+            <h2>Previous Appointments</h2>
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Doctor</th><th>Time</th><th>Status</th></tr>
+                </thead>
+                <tbody id="appointmentsTable">
+                    <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="notifications" class="section">
+            <h2>All Notifications</h2>
+            <div id="notificationList"></div>
+        </section>
+
+        <section id="prescriptions" class="section">
+            <h2>Prescription History</h2>
+            <div id="prescriptionsList"></div>
+        </section>
+
+        <section id="labReports" class="section">
+            <h2>Lab Reports</h2>
+            <div id="labReportsList"></div>
+        </section>
+
+        <section id="billing" class="section">
+            <h2>Billing & Payments</h2>
+            <div id="billingList"></div>
+        </section>
+
+    </div>
+
+<script>
+window.addEventListener('load', () => {
+    setTimeout(() => { document.getElementById('globalLoader').style.opacity = '0'; }, 600);
+    setTimeout(() => { document.getElementById('globalLoader').style.display = 'none'; }, 1400);
+    startCarousel();
+});
+
+function startCarousel() {
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+    }, 6000);
+}
+
+const API = 'http://localhost:3000/api';
+const patientId = localStorage.getItem('patientId');
+const patientPhone = localStorage.getItem('patientPhone');
+const patientName = localStorage.getItem('patientName') || 'Patient';
+
+// --- UPDATE HEADER NAME AND AVATAR ---
+document.getElementById('welcomeTitle').innerText = `Welcome, ${patientName}`;
+document.getElementById('profilePic').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(patientName)}&background=2d7a75&color=fff&size=128&bold=true`;
+
+function show(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId)?.classList.add('active');
+    document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('nav-' + sectionId)?.classList.add('active');
+
+    if (sectionId === 'dashboard' || sectionId === 'previousAppointments') loadAppointments();
+    if (sectionId === 'prescriptions' || sectionId === 'labReports') loadPrescriptionAndReports(); 
+    if (sectionId === 'billing') loadBills();
+    if (sectionId === 'notifications') loadNotifications();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('patientId');
+    localStorage.removeItem('patientPhone');
+    localStorage.removeItem('patientName');
+    window.location.href = '/';
+});
+
+// --- API FUNCTIONS ---
+
+async function loadAppointments() {
+    const tbody = document.getElementById('appointmentsTable');
+    const upcomingContainer = document.getElementById('upcomingWidget');
+    
+    try {
+        const res = await fetch(`${API}/appointments/patient/${encodeURIComponent(patientPhone)}`);
+        if (!res.ok) throw new Error('API Error');
+        const data = await res.json();
+
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="4">No appointments found.</td></tr>';
+            document.getElementById('totalAppointments').innerText = '0';
+            upcomingContainer.innerHTML = '<p style="color:#777; font-style:italic;">No upcoming appointments.</p>';
+            return;
+        }
+
+        document.getElementById('totalAppointments').innerText = data.length;
+        data.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        tbody.innerHTML = '';
+        let upcoming = [];
+        const now = new Date();
+
+        data.forEach(a => {
+            const dt = new Date(a.date);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dt.toLocaleDateString()}</td>
+                <td><strong style="color:var(--navy)">Dr. ${a.doctorName}</strong><br><small style="color:#888">${a.specialization || ''}</small></td>
+                <td>${dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                <td style="font-weight:bold; color:${getStatusColor(a.status)}">${a.status}</td>
+            `;
+            tbody.appendChild(tr);
+
+            if ((a.status === 'Pending' || a.status === 'Booked' || a.status === 'Approved') && dt > now) {
+                upcoming.push({ ...a, dt });
+            }
+        });
+
+        // Update Upcoming Widget
+        upcomingContainer.innerHTML = '';
+        upcoming.sort((a,b) => a.dt - b.dt);
+
+        if (upcoming.length > 0) {
+            const next = upcoming[0];
+            document.getElementById('nextAppointment').innerText = `${next.dt.toLocaleDateString('en-US', {month:'short', day:'numeric'})}`;
+            
+            upcoming.slice(0, 3).forEach(up => {
+                const div = document.createElement('div');
+                div.className = 'appt-item';
+                div.innerHTML = `
+                    <div class="date-badge">
+                        <span>${up.dt.getDate()}</span>
+                        <small>${up.dt.toLocaleString('default', { month: 'short' }).toUpperCase()}</small>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; color:var(--navy); font-size:1.05rem;">Dr. ${up.doctorName}</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem">${up.specialization || 'Consultation'} • ${up.dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                    </div>
+                `;
+                upcomingContainer.appendChild(div);
+            });
+        } else {
+             document.getElementById('nextAppointment').innerText = "None";
+             upcomingContainer.innerHTML = '<p style="color:#777; font-style:italic;">No upcoming appointments scheduled.</p>';
+        }
+
+    } catch(err) {
+        // Fallback for visual demonstration
+        console.warn('API Fail, showing dummy data');
+        document.getElementById('totalAppointments').innerText = '5';
+        document.getElementById('nextAppointment').innerText = 'Dec 24';
+        upcomingContainer.innerHTML = `
+             <div class="appt-item">
+                <div class="date-badge"><span>24</span><small>DEC</small></div>
+                <div><div style="font-weight:700; color:var(--navy)">Dr. Emily Stone</div><div style="color:#666">Cardiology • 10:00 AM</div></div>
+            </div>
+             <div class="appt-item">
+                <div class="date-badge" style="border-color:var(--gold); color:var(--gold)"><span>02</span><small>JAN</small></div>
+                <div><div style="font-weight:700; color:var(--navy)">Dr. Mark Smith</div><div style="color:#666">General Checkup • 02:30 PM</div></div>
+            </div>
+        `;
+    }
+}
+
+function getStatusColor(status) {
+    if(status === 'Approved' || status === 'Booked') return 'var(--teal)';
+    if(status === 'Cancelled') return 'var(--danger)';
+    if(status === 'Pending') return 'var(--gold)';
+    return 'var(--navy)';
+}
+
+async function loadNotifications() {
+    const list = document.getElementById('notificationList');
+    const alertWidget = document.getElementById('alertsWidget');
+
+    try {
+        const res = await fetch(`${API}/appointments/patient/${encodeURIComponent(patientPhone)}`);
+        if (!res.ok) throw new Error('Failed to load notifications');
+        const data = await res.json();
+
+        const viewedIds = JSON.parse(localStorage.getItem('patientViewedAppts') || '[]');
+        let html = '';
+        let unseenCount = 0;
+        let recentAlertsHtml = '';
+
+        // Sort by date desc
+        data.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        data.forEach(a => {
+            if (['Approved','Cancelled','Completed'].includes(a.status)) {
+                const dt = new Date(a.date);
+                const dateStr = dt.toLocaleDateString();
+                const seen = viewedIds.includes(String(a.appointment_id));
+                if (!seen) unseenCount++;
+
+                let msg = '';
+                let icon = '';
+                let color = '';
+                
+                if (a.status === 'Cancelled') {
+                    msg = `Appointment cancelled: Dr. ${a.doctorName} on ${dateStr}`;
+                    icon = 'cancel'; color = 'var(--danger)';
+                    html += `<div style="background:#fce4ec;color:#c0392b;padding:15px;border-radius:12px;margin-bottom:10px; border-left: 5px solid #c0392b;"><strong>Cancellation:</strong> ${msg}</div>`;
+                } else if (a.status === 'Approved') {
+                    msg = `Appointment approved: Dr. ${a.doctorName} on ${dateStr}`;
+                    icon = 'check_circle'; color = 'var(--teal)';
+                    html += `<div style="background:#fff3e0;color:#e67e22;padding:15px;border-radius:12px;margin-bottom:10px; border-left: 5px solid #e67e22;"><strong>Approved:</strong> ${msg}</div>`;
+                } else if (a.status === 'Completed') {
+                    msg = `Visit completed: Dr. ${a.doctorName}`;
+                    icon = 'task_alt'; color = 'var(--navy)';
+                    const actionLink = `<a href="#" onclick="show('prescriptions'); setTimeout(() => scrollToPrescription(${a.appointment_id}), 100); return false;" style="font-size:0.85rem; margin-left:15px; font-weight:700; color:var(--teal); text-decoration:none;">View Prescription &rarr;</a>`;
+                    html += `<div style="background:#e3f2fd;color:#2980b9;padding:15px;border-radius:12px;margin-bottom:10px; border-left: 5px solid #2980b9; display:flex; justify-content:space-between; align-items:center;">
+                                <div><strong>Completed:</strong> ${msg}</div>
+                                ${actionLink}
+                            </div>`;
+                }
+
+                if (recentAlertsHtml.split('class="alert-item"').length < 4) {
+                     recentAlertsHtml += `
+                        <div class="alert-item">
+                            <span class="material-symbols-outlined" style="color:${color}">${icon}</span>
+                            <div>
+                                <div style="font-weight:bold; font-size:0.95rem; color:var(--navy)">${a.status}</div>
+                                <div style="color:var(--text-muted); font-size:0.85rem">${msg}</div>
+                            </div>
+                        </div>
+                     `;
+                }
+            }
+        });
+
+        if (!html) html = '<p>No notifications.</p>';
+        list.innerHTML = html;
+
+        if (recentAlertsHtml) {
+            alertWidget.innerHTML = recentAlertsHtml;
+        }
+
+        const badge = document.getElementById('notifBadge');
+        if (unseenCount > 0) { 
+            badge.style.display = 'inline-block'; 
+            badge.innerText = unseenCount; 
+            document.getElementById('alertsCount').innerText = unseenCount; 
+        } else { 
+            badge.style.display = 'none'; 
+            document.getElementById('alertsCount').innerText = '0'; 
+        }
+
+    } catch (err) {
+        console.error('Error in loadNotifications', err);
+        document.getElementById('alertsCount').innerText = '2'; 
+        alertWidget.innerHTML = `
+            <div class="alert-item"><span class="material-symbols-outlined" style="color:var(--teal)">check_circle</span><div><div style="font-weight:bold;color:var(--navy)">Lab Results</div><div style="color:#666">Blood work ready</div></div></div>
+            <div class="alert-item"><span class="material-symbols-outlined" style="color:var(--gold)">schedule</span><div><div style="font-weight:bold;color:var(--navy)">Pending Appt</div><div style="color:#666">Dr. Smith approval</div></div></div>
+        `;
+    }
+}
+
+function scrollToPrescription(appointmentId) {
+    const anchor = document.getElementById('prescription-' + appointmentId);
+    if (anchor) {
+        anchor.scrollIntoView({behavior:'smooth', block:'start'});
+        const card = anchor.nextElementSibling;
+        if (card) {
+            card.style.transition = 'box-shadow 0.3s, border-left 0.3s';
+            card.style.boxShadow = '0 0 0 3px rgba(45, 122, 117, 0.3)'; 
+            card.style.borderLeft = '6px solid var(--teal)';
+            setTimeout(()=>{ card.style.boxShadow=''; card.style.borderLeft='5px solid var(--teal)'; }, 2500);
+        }
+    }
+}
+
+async function loadPrescriptionAndReports() {
+    const pxList = document.getElementById('prescriptionsList');
+    const lrList = document.getElementById('labReportsList');
+    pxList.innerHTML = '<p>Loading prescriptions...</p>';
+    lrList.innerHTML = '<p>Loading lab reports...</p>';
+
+    try {
+        const res = await fetch(`${API}/patients/${encodeURIComponent(patientId)}/prescriptions`);
+        if (!res.ok) {
+            const err = await res.json().catch(()=>({message:res.statusText}));
+            throw new Error(err.message || 'Failed to fetch prescriptions');
+        }
+        const data = await res.json();
+        const prescriptions = data.combinedHistory || [];
+        const labReports = data.labReports || [];
+
+        if (!prescriptions.length) {
+            pxList.innerHTML = '<p>No prescription history found.</p>';
+        } else {
+            pxList.innerHTML = '';
+            prescriptions.forEach(p => {
+                const created = p.record_date ? new Date(p.record_date) : null;
+                const dateStr = created ? created.toLocaleString() : '—';
+                const anchorId = `prescription-${p.appointment_id}`;
+                
+                const div = document.createElement('div');
+                div.style.marginBottom = "20px";
+                div.innerHTML = `
+                    <a id="${anchorId}" style="position:relative; top:-20px; display:block;"></a>
+                    <div style="background:#fff; padding:20px; border-radius:12px; border-left:5px solid var(--teal); box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <strong style="color:var(--navy); font-size:1.1rem;">Prescription — Dr. ${p.doctorName}</strong>
+                            <span style="color:#888; font-size:0.85rem;">${dateStr}</span>
+                        </div>
+                        <div style="margin-top:10px; background:#f9f9f9; padding:15px; border-radius:8px; color:#555; line-height:1.6;">
+                            ${p.diagnosis || p.prescription_details || '—'}
+                        </div>
+                    </div>
+                `;
+                pxList.appendChild(div);
+            });
+        }
+
+        if (!labReports.length) {
+            lrList.innerHTML = '<p>No lab reports found.</p>';
+        } else {
+            let table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr><th>Date Ordered</th><th>Doctor</th><th>Test</th><th>Status</th><th>Report</th></tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+
+            labReports.forEach(r => {
+                const date = r.order_date ? new Date(r.order_date).toLocaleDateString() : '—';
+                let reportLink = 'Not available';
+
+                if (r.status === 'Completed' && r.document_link) {
+                    let base = r.document_link;
+                    if (!base.startsWith('/') && !base.startsWith('http')) base = '/reports/' + base.replace(/^\/+/, '');
+                    const sep = base.includes('?') ? '&' : '?';
+                    const href = `${base}${sep}order_id=${encodeURIComponent(r.order_id)}`;
+                    reportLink = `<a href="${href}" target="_blank" class="btn" style="padding:6px 12px; font-size:0.75rem;">View Report</a>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td>${r.doctorName || ''}</td>
+                    <td>${r.test_name || ''}</td>
+                    <td>${r.status || ''}</td>
+                    <td>${reportLink}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            lrList.innerHTML = '';
+            lrList.appendChild(table);
+        }
+
+    } catch (err) {
+        console.error('Error in loadPrescriptionAndReports', err);
+        pxList.innerHTML = `<p style="color:#f88;">API Error (Check Console)</p>`;
+        lrList.innerHTML = `<p style="color:#f88;">API Error (Check Console)</p>`;
+    }
+}
+
+async function loadBills() {
+    const container = document.getElementById('billingList');
+    container.innerHTML = '<p>Loading bills...</p>';
+    try {
+        const res = await fetch(`${API}/patients/${encodeURIComponent(patientId)}/bills`);
+        if (!res.ok) throw new Error('Failed to fetch bills');
+        const bills = await res.json();
+        if (!Array.isArray(bills) || bills.length === 0) {
+            container.innerHTML = '<p>No bills found.</p>';
+            return;
+        }
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+            <thead>
+                <tr><th>Bill ID</th><th>Issue Date</th><th>Doctor</th><th>Consultation</th><th>Total</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+
+        bills.forEach(b => {
+            const issue = b.issue_date ? new Date(b.issue_date).toLocaleString() : (b.bill_date ? new Date(b.bill_date).toLocaleString() : '—');
+            const doctor = b.doctorName || '';
+            const consult = typeof b.consultation_fee !== 'undefined' ? parseFloat(b.consultation_fee).toFixed(2) : '0.00';
+            const total = typeof b.total_amount !== 'undefined' ? parseFloat(b.total_amount).toFixed(2) : '0.00';
+            const status = b.status || b.payment_status || b.paymentStatus || 'Pending';
+            const statusClass = `bill-status-${status}`;
+
+            let action = '';
+            if ((status === 'Unpaid' || status === 'Pending') && status !== 'Paid') {
+                action = `<button class="btn" onclick="payBill(${b.bill_id})" style="padding:6px 12px;">Pay</button>`;
+            } else {
+                action = `<span class="${statusClass}">${status === 'Paid' ? 'Paid' : status}</span>`;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>#${b.bill_id}</td>
+                <td>${issue}</td>
+                <td>${doctor}</td>
+                <td>$${consult}</td>
+                <td><strong>$${total}</strong></td>
+                <td><span class="${statusClass}">${status}</span></td>
+                <td>${action}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(table);
+
+    } catch (err) {
+        console.error('Error in loadBills', err);
+        container.innerHTML = `<p style="color:#f88;">API Error (Check Console)</p>`;
+    }
+}
+
+async function payBill(billId) {
+    if (!confirm(`Confirm payment of Bill ID ${billId}?`)) return;
+    try {
+        const res = await fetch(`${API}/bills/${billId}/pay`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const body = await res.json().catch(()=>({}));
+        if (!res.ok) {
+            alert('Payment failed: ' + (body.message || res.statusText));
+            return;
+        }
+        alert(body.message || 'Payment successful.');
+        loadBills();
+    } catch (err) {
+        console.error(err);
+        alert('Network error while attempting to pay the bill.');
+    }
+}
+
+async function init() {
+    await loadAppointments();
+    await loadNotifications();
+}
+init();
+</script>
+</body>
+</html>

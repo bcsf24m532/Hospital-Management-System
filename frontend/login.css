@@ -1,0 +1,39 @@
+body {
+    background-color:  #2C3E50;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width:300vh
+    margin: 0;
+}
+h1{
+color:#2C3E50;
+font-size:32px;
+font-family:Arial,sans serif;
+}
+
+.login-box {
+    background-color:#ffff;
+    color:#2C3E50;
+    padding: 30px;
+    text-align: center;
+    width:40vh;
+    height:40vh;
+    border-radius: 20px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.login-box input {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    width: 80%;
+    color:#2C3E50;
+}
+@media (max-width: 500px) {
+    .login-box {
+        width: 70%;     
+        padding: 20px;  
+    }
+}

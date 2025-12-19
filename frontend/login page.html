@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. Theme and Base Setup --- */
+        :root {
+            --primary-color: #2C3E50; /* Deep Blue/Navy */
+            --secondary-color: #1ABC9C; /* Teal/Accent */
+            --background-light: #f7f7f7; 
+            --text-dark: #333;
+            --input-border: #ddd;
+        }
+
+        /* Full Page Background */
+        body {
+            background-color: var(--background-light); 
+            font-family: 'Poppins', sans-serif;
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* --- 2. Main Layout (Two-Column Portal Wrapper) --- */
+        .main-wrapper {
+            width: 100%;
+            max-width: 1200px; /* Max width for large screens */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-box {
+            display: flex;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); 
+            overflow: hidden; 
+            height: auto; 
+            max-height: 95vh; /* Prevents overflow issues on smaller screens */
+        }
+        
+        /* FORM ON THE LEFT */
+        .auth-form-content {
+            flex: 1; 
+            padding: 50px 40px;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            /* FIX: Allows content to scroll vertically if needed */
+            overflow-y: auto; 
+            order: 1; /* Explicitly place the form first */
+        }
+
+        /* SIDE INFO ON THE RIGHT */
+        .auth-side-info {
+            flex: 1; 
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            color: white;
+            position: relative;
+            order: 2; /* Explicitly place the side box second */
+        }
+        
+        .auth-side-info h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .auth-side-info p {
+            font-size: 16px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        
+        .auth-side-info::after {
+            /* Simulating a subtle pattern or graphic */
+            content: "🏥";
+            font-size: 150px;
+            opacity: 0.1;
+            position: absolute;
+        }
+
+        /* --- 3. Login Container (Form Styling) --- */
+        .login-container { 
+            width: 100%; 
+            max-width: 400px; 
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            border-top: none;
+        }
+        
+        .login-container h2 { 
+            text-align: left; 
+            margin-bottom: 30px; 
+            color: var(--primary-color); 
+            font-size: 30px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--text-dark); /* Changed to text-dark for contrast */
+            font-size: 14px;
+        }
+        
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--input-border); 
+            border-radius: 6px; 
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 1px var(--secondary-color); /* Sharp focus outline */
+            outline: none;
+        }
+        
+        /* --- Radio Button Styling (User Type Selector) --- */
+        .radio-group { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-bottom: 30px; 
+            padding: 10px 0;
+            border-bottom: 1px solid #eee; 
+            border-top: 1px solid #eee; /* Added top border for separation */
+        }
+        
+        .radio-group label { 
+            font-weight: 500;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.3s;
+            padding: 5px 10px;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            color: var(--secondary-color);
+            font-weight: 700;
+            /* Optional: Add a small bar under the active label */
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        /* --- Button Styling --- */
+        button { 
+            width: 100%; 
+            padding: 14px; /* Increased padding */
+            background-color: var(--secondary-color); 
+            border: none; 
+            border-radius: 6px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 700;
+            cursor: pointer; 
+            transition: background-color 0.3s, transform 0.1s; 
+        }
+        
+        button:hover { 
+            background-color: #16a085; 
+            transform: translateY(-1px);
+        }
+        
+        .register-link { 
+            text-align: center; 
+            margin-top: 25px; 
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        /* --- 4. Responsiveness --- */
+        @media (max-width: 900px) {
+            .auth-box {
+                flex-direction: column;
+                min-height: auto;
+                max-height: 98vh; 
+            }
+            .auth-side-info {
+                display: none; /* Hide side info on mobile/tablet for space */
+                order: 2; /* Still applies, but won't be seen */
+            }
+            .auth-form-content {
+                padding: 40px 20px;
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <div class="auth-box">
+        
+        <div class="auth-form-content">
+            <div class="login-container">
+                <h2>User Login</h2>
+            
+                <div class="radio-group">
+                    <input type="radio" id="patient" name="user_type" value="patient" checked>
+                    <label for="patient">Patient</label>
+                    <input type="radio" id="doctor" name="user_type" value="doctor">
+                    <label for="doctor">Doctor</label>
+                    <input type="radio" id="admin" name="user_type" value="admin">
+                    <label for="admin">Admin</label>
+                </div>
+            
+                <form id="loginForm">
+                    <div class="form-group" id="identifierGroup">
+                        <label for="identifier" id="identifierLabel">Phone Number</label>
+                        <input type="text" id="identifier" name="phone" required placeholder="Enter Phone Number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter Password">
+                    </div>
+            
+                    <button type="submit">Login</button>
+                </form>
+            
+                <div class="register-link">
+                    Don't have an account? <a href="patientregistration.html">Register Here</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-side-info">
+            <h2>Access Your Health Portal</h2>
+            <p>Your secure gateway to appointments, prescriptions, and your complete medical history. Please select your user type above to continue.</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('loginForm');
+        const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+        const identifierLabel = document.getElementById('identifierLabel');
+        const identifierInput = document.getElementById('identifier');
+        const identifierGroup = document.getElementById('identifierGroup');
+
+        // Function to update the input field based on user type
+        function updateIdentifier() {
+            const selectedType = document.querySelector('input[name="user_type"]:checked').value;
+            
+            // Hide identifier field for Admin
+            if (selectedType === 'admin') {
+                identifierGroup.style.display = 'none';
+                identifierInput.removeAttribute('required'); // Not required for admin
+                return;
+            } else {
+                identifierGroup.style.display = 'block';
+                identifierInput.setAttribute('required', 'required');
+            }
+
+            // Logic for Patient/Doctor
+            if (selectedType === 'patient') {
+                identifierLabel.textContent = 'Phone Number';
+                identifierInput.type = 'text'; 
+                identifierInput.name = 'phone';
+                identifierInput.placeholder = 'Enter Phone Number';
+            } else if (selectedType === 'doctor') {
+                identifierLabel.textContent = 'Email';
+                identifierInput.type = 'email'; 
+                identifierInput.name = 'email';
+                identifierInput.placeholder = 'Enter Email Address';
+            }
+        }
+
+        userTypeRadios.forEach(radio => radio.addEventListener('change', updateIdentifier));
+        updateIdentifier(); // Initial call to set defaults
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedType = document.querySelector('input[name="user_type"]:checked').value;
+            const identifier = identifierInput.value;
+            const password = document.getElementById('password').value;
+            
+            // Start with only the password included
+            const loginData = { password }; 
+            let endpoint = '';
+            let redirectPage = '';
+
+            if (selectedType === 'patient') {
+                loginData.phone = identifier;
+                endpoint = 'api/patients/login';
+                redirectPage = 'patient-dashboard.html'; 
+            } else if (selectedType === 'doctor') {
+                loginData.email = identifier;
+                endpoint = 'api/doctors/login';
+                redirectPage = 'doctordashboard.html';
+            } else if (selectedType === 'admin') { 
+                // Add the hardcoded 'admin' username for the server check
+                loginData.username = 'admin'; 
+                endpoint = 'api/admin/login'; 
+                redirectPage = 'admindashboard.html'; 
+            }
+
+            try {
+                const res = await fetch(`http://localhost:3000/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                // --- IMPROVED ERROR HANDLING START ---
+                if (!res.ok) {
+                    let data;
+                    try {
+                        // Attempt to parse JSON error message from server
+                        data = await res.json();
+                    } catch (e) {
+                        // Server sent back a 404 (HTML page) or non-JSON error
+                        alert(`Login Failed: Server responded with status ${res.status} (${res.statusText}). Check server console/routes.`);
+                        return;
+                    }
+                    
+                    // If JSON was successfully parsed but response was not 'ok' (e.g., 401)
+                    alert(`Login Failed: ${data.message || 'Invalid credentials.'}`);
+                    return; 
+                }
+                // --- IMPROVED ERROR HANDLING END ---
+
+                // If res.ok is true, parse the data successfully
+                const data = await res.json();
+                
+                // Clear previous data
+                localStorage.clear(); 
+                
+                if (selectedType === 'patient') {
+                    // Store Patient details
+                    localStorage.setItem('patientId', data.patient.patient_id);
+                    localStorage.setItem('patientName', data.patient.name);
+                    localStorage.setItem('patientPhone', data.patient.phone);
+                    localStorage.setItem('patientDetails', JSON.stringify(data.patient));
+                } else if (selectedType === 'doctor') {
+                    // Store Doctor details
+                    localStorage.setItem('doctorId', data.doctor.doctor_id);
+                    localStorage.setItem('doctorName', data.doctor.name);
+                    localStorage.setItem('doctorSpecialization', data.doctor.specialization);
+                } else if (selectedType === 'admin') {
+                    // Store minimal Admin details
+                    localStorage.setItem('isAdmin', 'true');
+                    localStorage.setItem('adminUser', 'AKSHospitalAdmin');
+                }
+
+                alert(`Login Successful! Redirecting to dashboard.`);
+                window.location.href = redirectPage;
+
+            } catch (error) {
+                console.error('Network or Server Error during login:', error);
+                // This will catch network issues (server down) or unexpected errors during fetch setup
+                alert('Network Error: Could not connect to the server (localhost:3000). Check if the Node server is running.');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill Details</title>
+</head>
+<body>
+    <h2>Bill Information</h2>
+    <div id="billContainer">Loading...</div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const billId = params.get("id");
+
+        fetch(`http://localhost:3000/api/bills/${billId}`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById("billContainer").innerHTML = `
+                    <p><b>Bill ID:</b> ${data.bill_id}</p>
+                    <p><b>Patient:</b> ${data.patientName}</p>
+                    <p><b>Doctor:</b> ${data.doctorName}</p>
+                    <p><b>Appointment Date:</b> ${new Date(data.appointment_date).toLocaleString()}</p>
+                    <p><b>Total Amount:</b> Rs ${data.total_amount}</p>
+                    <p><b>Consultation Fee:</b> Rs ${data.consultation_fee}</p>
+                    <p><b>Status:</b> ${data.payment_status}</p>
+                    <p><b>Issued On:</b> ${new Date(data.issue_date).toLocaleString()}</p>
+                `;
+            });
+    </script>
+</body>
+</html>

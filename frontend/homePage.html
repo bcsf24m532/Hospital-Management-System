@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>AKS Health Care | Where Health Meets Excellence</title>
+    
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================
+           Core Variables & Loader
+           =========================== */
+        :root {
+            --teal: #2d7a75;
+            --teal-dark: #1f5c58;
+            --navy: #1a3236;
+            --gold: #c5a059;
+            --bg-light: #f8f9fa;
+            --bg-card: #ffffff;
+            --bg-main: #f0f4f8;
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+            --text-main: #263238;
+            --text-muted: #546e7a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        #globalLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #152022; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .aks-logo-text {
+            font-family: var(--font-head); font-size: 5rem; font-weight: 700;
+            color: #fff; display: flex; gap: 15px;
+        }
+
+        .aks-logo-text span {
+            opacity: 0; filter: blur(10px); transform: translateY(10px);
+            animation: cinematicReveal 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .aks-logo-text span:nth-child(1) { animation-delay: 0.1s; }
+        .aks-logo-text span:nth-child(2) { animation-delay: 0.3s; color: var(--teal); }
+        .aks-logo-text span:nth-child(3) { animation-delay: 0.5s; }
+
+        .loader-line {
+            width: 0; height: 2px; background: var(--gold); margin-top: 10px;
+            animation: lineExpand 1.5s ease forwards 0.6s;
+        }
+
+        @keyframes cinematicReveal { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+        @keyframes lineExpand { to { width: 120px; } }
+
+        /* ===========================
+           Animated Ticker Banner
+           =========================== */
+        .ticker-banner {
+            background: var(--bg-main);
+            overflow: hidden;
+            padding: 35px 0;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .ticker-content {
+            display: flex;
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            padding: 0 25px;
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #6b6b6b;
+            font-family: var(--font-body);
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===========================
+           Sections Styling
+           =========================== */
+        
+        section { padding: 80px 5%; }
+
+        .section-title {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            color: var(--navy);
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 50px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        /* Services - Teal Gradient Background */
+        #services {
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            color: white;
+            padding: 80px 5% 100px;
+        }
+
+        #services .section-title { color: white; }
+        #services .section-subtitle { color: rgba(255,255,255,0.9); }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: rgba(255,255,255,0.1);
+            padding: 35px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-family: var(--font-head);
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .service-card p {
+            color: rgba(255,255,255,0.85);
+            line-height: 1.7;
+            font-size: 0.92rem;
+            font-weight: 400;
+        }
+
+        /* Departments - Light Background */
+        #departments {
+            background: var(--bg-light);
+        }
+
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .dept-card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            border-top: 3px solid var(--teal);
+        }
+
+        .dept-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(45,122,117,0.15);
+        }
+
+        .dept-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(45,122,117,0.3);
+        }
+
+        .dept-card h3 {
+            font-family: var(--font-head);
+            font-size: 1.3rem;
+            color: var(--navy);
+            margin-bottom: 10px;
+        }
+
+        .dept-card p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* Why Choose Us - Same as Emergency */
+        #why-choose {
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            color: white;
+        }
+
+        #why-choose .section-title { color: white; }
+        #why-choose .section-subtitle { color: rgba(255,255,255,0.9); }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-box {
+            background: rgba(255,255,255,0.1);
+            padding: 35px 25px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s;
+        }
+
+        .feature-box:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-5px);
+        }
+
+        .feature-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-head);
+            margin-bottom: 10px;
+        }
+
+        .feature-number.animate {
+            animation: countUp 2s ease-out forwards;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-box h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-family: var(--font-head);
+            font-weight: 600;
+        }
+
+        .feature-box p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+        }
+
+        /* Doctors - Light */
+        #doctors {
+            background: var(--bg-light);
+        }
+
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(45,122,117,0.2);
+        }
+
+        .doctor-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .doctor-info {
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .doctor-info h3 {
+            font-family: var(--font-head);
+            font-size: 1.3rem;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .doctor-info p {
+            color: var(--teal);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Emergency Contact - Teal */
+        #emergency {
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+            text-align: center;
+            color: white;
+            padding: 60px 5%;
+        }
+
+        #emergency h2 {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        #emergency p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            opacity: 0.95;
+        }
+
+        .emergency-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: var(--font-head);
+            color: var(--gold);
+            letter-spacing: 3px;
+        }
+
+        /* Contact - Light */
+        #contact {
+            background: var(--bg-light);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .contact-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            border-top: 4px solid var(--teal);
+        }
+
+        .contact-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(45,122,117,0.15);
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+            color: var(--teal);
+            margin-bottom: 20px;
+        }
+
+        .contact-box h3 {
+            font-family: var(--font-head);
+            font-size: 1.4rem;
+            color: var(--navy);
+            margin-bottom: 15px;
+        }
+
+        .contact-box p {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 0.98rem;
+            font-weight: 400;
+        }
+
+        /* Footer - Services Color */
+        .main-footer {
+            background: linear-gradient(135deg, var(--navy) 0%, #122123 100%);
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .section-title { font-size: 2rem; }
+            .ticker-item { font-size: 1rem; padding: 0 40px; }
+            .emergency-number { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="globalLoader">
+        <div class="aks-logo-text">
+            <span>A</span>
+            <span>K</span>
+            <span>S</span>
+        </div>
+        <div class="loader-line"></div>
+    </div>
+
+    <section class="header-section">
+        <nav class="main-nav">
+            <a href="homepage.html" class="logo-area">
+                <img src="images/logof.png" alt="AKS Logo">
+                <h1>AKS</h1>
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <i class="fa fa-times" onclick="hideMenue()"></i>
+                <ul>
+                    <li><a href="homepage.html" class="active">HOME</a></li>
+                    <li><a href="#services">SERVICES</a></li>
+                    <li><a href="#doctors">DOCTORS</a></li>
+                    <li><a href="#contact">CONTACT</a></li>
+                </ul>
+                <a href="login page.html" class="login-btn-container">
+                    <button class="primary-btn">Login</button>
+                </a>
+            </div>
+            <i class="fa fa-bars menu-toggle" onclick="showMenue()"></i>
+        </nav>
+        
+        <div class="hero-text-box">
+            <h2 class="hero-title">Where Health Meets Excellence</h2>
+            <p class="hero-description">AKS Medical Complex is dedicated to providing exceptional healthcare with compassion and expertise. Our team of skilled doctors and staff work tirelessly to ensure the well-being of every patient. Combining modern technology with a patient-centered approach, we deliver trusted medical care for you and your family. At AKS, your health is always our top priority.</p>
+            <a href="abouts.html" class="hero-btn">More About Us</a>
+        </div>
+    </section>
+
+    <section class="tour-section content-padding">
+        <h2 class="section-title">Hospital's Virtual Tour</h2>
+        <p class="tour-description">Our hospital is conveniently located in the heart of the city... Explore our campus online and experience a comfortable and safe environment...</p>
+        <a href="hpp.html">
+            <button class="primary-btn explore-btn">Explore the Hospital</button>
+        </a>
+    </section>
+
+    <!-- Animated Ticker -->
+    <div class="ticker-banner">
+        <div class="ticker-content">
+            <span class="ticker-item">We value your time- AKS Hospital - Where health meets excellence</span>
+            <span class="ticker-item">We value your time- AKS Hospital - Where health meets excellence</span>
+            <span class="ticker-item">We value your time- AKS Hospital - Where health meets excellence</span>
+            <span class="ticker-item">We value your time- AKS Hospital - Where health meets excellence</span>
+        </div>
+    </div>
+
+    <!-- Services -->
+    <section id="services">
+        <h2 class="section-title">Our Services</h2>
+        <p class="section-subtitle">Comprehensive healthcare solutions available 24/7 for your well-being</p>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-clock service-icon"></i>
+                <h3>24/7 OPD</h3>
+                <p>Round-the-clock outpatient services ensuring timely care whenever you need it.</p>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-procedures service-icon"></i>
+                <h3>Emergency Care</h3>
+                <p>Fully equipped emergency unit with immediate response and critical care facilities.</p>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-user-md service-icon"></i>
+                <h3>Specialist Consultations</h3>
+                <p>Access to experienced specialists across multiple medical departments.</p>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-heartbeat service-icon"></i>
+                <h3>ICU & Critical Care</h3>
+                <p>Advanced intensive care unit with state-of-the-art monitoring systems.</p>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-vials service-icon"></i>
+                <h3>Laboratory Services</h3>
+                <p>Comprehensive diagnostic testing with accurate and timely results.</p>
+            </div>
+            
+            <div class="service-card">
+                <i class="fas fa-x-ray service-icon"></i>
+                <h3>Radiology & Imaging</h3>
+                <p>Advanced imaging technology including X-Ray, CT, and MRI scans.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Departments -->
+    <section id="departments">
+        <h2 class="section-title">Our Departments</h2>
+        <p class="section-subtitle">Specialized medical care across multiple disciplines</p>
+        
+        <div class="dept-grid">
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-heart"></i></div>
+                <h3>Cardiology</h3>
+                <p>Expert cardiac care and cardiovascular treatments</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-brain"></i></div>
+                <h3>Neurology</h3>
+                <p>Advanced neurological diagnosis and treatment</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-bone"></i></div>
+                <h3>Orthopedics</h3>
+                <p>Comprehensive bone and joint care solutions</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-baby"></i></div>
+                <h3>Pediatrics</h3>
+                <p>Specialized healthcare for infants and children</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-lungs"></i></div>
+                <h3>Pulmonology</h3>
+                <p>Respiratory and lung disease management</p>
+            </div>
+            
+            <div class="dept-card">
+                <div class="dept-icon"><i class="fas fa-female"></i></div>
+                <h3>Gynecology</h3>
+                <p>Comprehensive women's health services</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="why-choose">
+        <h2 class="section-title">Why Choose AKS Hospital</h2>
+        <p class="section-subtitle">Excellence in healthcare backed by years of trusted service</p>
+        
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-number">15+</div>
+                <h4>Years of Experience</h4>
+                <p>Serving the community with dedication</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="feature-number">50+</div>
+                <h4>Expert Doctors</h4>
+                <p>Highly qualified medical professionals</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="feature-number">10K+</div>
+                <h4>Happy Patients</h4>
+                <p>Satisfied patients and counting</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="feature-number">24/7</div>
+                <h4>Emergency Service</h4>
+                <p>Always here when you need us</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-number">100%</div>
+                <h4>Patient Satisfaction</h4>
+                <p>Committed to excellence in care</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-number">20+</div>
+                <h4>Specializations</h4>
+                <p>Comprehensive medical services</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Doctors -->
+    <section id="doctors">
+        <h2 class="section-title">Meet Our Doctors</h2>
+        <p class="section-subtitle">Highly skilled medical professionals committed to your care</p>
+
+        <div class="doctors-grid">
+            <div class="doctor-card">
+                <img src="images/dr1.webp" alt="Dr. Omar Farooq">
+                <div class="doctor-info">
+                    <h3>Dr. Omar Farooq</h3>
+                    <p>General Surgeon</p>
+                </div>
+            </div>
+
+            <div class="doctor-card">
+                <img src="images/dr2.webp" alt="Dr. Ayesha Siddiqui">
+                <div class="doctor-info">
+                    <h3>Dr. Ayesha Siddiqui</h3>
+                    <p>Gynecologist</p>
+                </div>
+            </div>
+
+            <div class="doctor-card">
+                <img src="images/dr3.jpg" alt="Dr. Imran Tariq">
+                <div class="doctor-info">
+                    <h3>Dr. Imran Tariq</h3>
+                    <p>Radiologist</p>
+                </div>
+            </div>
+
+            <div class="doctor-card">
+                <img src="images/dr4.webp" alt="Dr. Hina Riaz">
+                <div class="doctor-info">
+                    <h3>Dr. Hina Riaz</h3>
+                    <p>Dermatologist</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Call -->
+    <section id="emergency">
+        <h2>24/7 Emergency Services</h2>
+        <p>Medical emergencies don't wait. Neither do we.</p>
+        <div class="emergency-number">1122</div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <p class="section-subtitle">Your health is our first priority. Reach out anytime.</p>
+
+        <div class="contact-grid">
+            <div class="contact-box">
+                <i class="fas fa-phone-volume contact-icon"></i>
+                <h3>Phone Numbers</h3>
+                <p><strong>Emergency:</strong> 1122</p>
+                <p><strong>Appointments:</strong> +92-300-1234567</p>
+                <p><strong>General:</strong> +92-42-9876543</p>
+            </div>
+
+            <div class="contact-box">
+                <i class="fas fa-envelope contact-icon"></i>
+                <h3>Email</h3>
+                <p>info@AKS.com</p>
+                <p>appointments@AKS.com</p>
+            </div>
+
+            <div class="contact-box">
+                <i class="fas fa-map-marker-alt contact-icon"></i>
+                <h3>Address</h3>
+                <p>AKS Health Care</p>
+                <p>123 Main Boulevard, Lahore, Pakistan</p>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="main-footer">
+        <p>&copy; 2025 AKS Health Care. All rights reserved.</p>
+    </footer>
+
+    <script>
+        var navLinks = document.getElementById("navLinks");
+        function showMenue() { navLinks.style.right = "0"; }
+        function hideMenue() { navLinks.style.right = "-300px"; }
+
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            const loader = document.getElementById('globalLoader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 800);
+          }, 1500);
+
+          // Animate numbers when Why Choose section is visible
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                animateNumbers();
+                observer.disconnect();
+              }
+            });
+          }, { threshold: 0.3 });
+
+          const whySection = document.getElementById('why-choose');
+          if (whySection) observer.observe(whySection);
+        });
+
+        function animateNumbers() {
+          const counters = [
+            { element: document.querySelectorAll('.feature-number')[0], target: 15, suffix: '+' },
+            { element: document.querySelectorAll('.feature-number')[1], target: 50, suffix: '+' },
+            { element: document.querySelectorAll('.feature-number')[2], target: 10, suffix: 'K+' },
+            { element: document.querySelectorAll('.feature-number')[3], target: 24, suffix: '/7' },
+            { element: document.querySelectorAll('.feature-number')[4], target: 100, suffix: '%' },
+            { element: document.querySelectorAll('.feature-number')[5], target: 20, suffix: '+' }
+          ];
+
+          counters.forEach(counter => {
+            if (!counter.element) return;
+            counter.element.classList.add('animate');
+            let current = 0;
+            const increment = counter.target / 50;
+            const timer = setInterval(() => {
+              current += increment;
+              if (current >= counter.target) {
+                counter.element.textContent = counter.target + counter.suffix;
+                clearInterval(timer);
+              } else {
+                counter.element.textContent = Math.floor(current) + (counter.suffix.includes('/') || counter.suffix === '%' ? counter.suffix : '');
+              }
+            }, 40);
+          });
+        }
+    </script>
+</body>
+</html>

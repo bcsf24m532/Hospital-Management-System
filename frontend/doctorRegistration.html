@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Registration</title>
+    <style>
+        /* Minimal styles for a clean registration page */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ecf0f1;
+        }
+        .account {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+        .account input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .account h2 { 
+            margin-bottom: 25px;
+            color: #2C3E50;
+        }
+    </style>
+</head>
+<body>
+    <div class="account">
+        <h2>Doctor Registration</h2>
+        
+        <input type="text" id="name" placeholder="Enter Name">
+        <input type="text" id="specialization" placeholder="Enter Specialization">
+        <input type="text" id="phone" placeholder="Enter Phone">
+        <input type="text" id="email" placeholder="Enter Email">
+        <input type="number" id="department_id" placeholder="Department ID (e.g., 1)">
+        <input type="password" id="password" placeholder="Enter Password">
+        
+        <button id="registerBtn"
+            style="background-color:#2C3E50;color:#fff;width:100%;cursor:pointer;padding:10px;font-weight:bold;border:none;border-radius:4px;">
+            Register Doctor
+        </button>
+        
+        <br><br>
+
+        <a href="admindashboard.html">
+            <button style="background-color: #fff; color: #2C3E50; border: 2px solid #2C3E50; padding: 8px 15px;
+            font-weight:bold; border-radius: 5px; cursor: pointer;font-size:14px;">Back to Dashboard</button>
+        </a>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000/api';
+        
+        document.getElementById('registerBtn').addEventListener('click', registerDoctor);
+
+        function registerDoctor() {
+            const name = document.getElementById('name').value.trim();
+            const specialization = document.getElementById('specialization').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            // Read the dynamic value from the input field
+            const department_id_str = document.getElementById('department_id').value.trim(); 
+
+            if (!name || !specialization || !phone || !email || !password || !department_id_str) {
+                alert('All fields are required!');
+                return;
+            }
+
+            const payload = { 
+                name, 
+                specialization, 
+                phone, 
+                email, 
+                department_id: parseInt(department_id_str) || null, // Ensure department_id is parsed as an integer
+                password 
+            };
+            
+            fetch(`${BASE_URL}/doctors`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async res => {
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Success: ' + data.message);
+                    // 🟢 Redirect back to the Admin Dashboard upon success
+                    window.location.href = 'admindashboard.html'; 
+                } else {
+                    alert('Error: ' + (data.message || 'Registration failed'));
+                    console.error('Server error:', data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('Registration failed. Check console and ensure the Node.js server is running.');
+            });
+        }
+    </script>
+</body>
+</html>

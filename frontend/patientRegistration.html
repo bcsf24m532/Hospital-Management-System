@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #1ABC9C;
+            --background-light: #f7f7f7;
+            --text-dark: #333;
+            --input-border: #ddd;
+        }
+
+        body {
+            background-color: var(--background-light);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-box {
+            display: flex;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        .auth-side-info {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            color: white;
+            position: relative;
+            text-align: center;
+        }
+
+        .auth-side-info::after {
+            content: "🏥";
+            font-size: 150px;
+            opacity: 0.1;
+            position: absolute;
+        }
+
+        .auth-form-content {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .account {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .account h2 {
+            margin-bottom: 30px;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .account input,
+        .account select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--input-border);
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .account input:focus,
+        .account select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 1px var(--secondary-color);
+            outline: none;
+        }
+
+        #registerBtn {
+            width: 100%;
+            padding: 14px;
+            background: var(--secondary-color);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #registerBtn:hover {
+            background: #16a085;
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .auth-box {
+                flex-direction: column;
+            }
+            .auth-side-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="auth-box">
+
+        <div class="auth-side-info">
+            <h2>Welcome to the Patient Portal</h2>
+            <p>Register quickly to manage appointments, access medical records, and connect with our doctors.</p>
+        </div>
+
+        <div class="auth-form-content">
+            <div class="account">
+                <h2>Patient Registration</h2>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="name">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender">
+                        <option value="" disabled selected>Select Gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="phone">
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="address">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password">
+                </div>
+
+                <button id="registerBtn">Register Account</button>
+
+                <a href="login%20page.html">
+                    <button type="button" class="back-btn">Back to Login</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const registerBtn = document.getElementById('registerBtn');
+
+registerBtn.addEventListener('click', async () => {
+    const name = document.getElementById('name').value.trim();
+    const gender = document.getElementById('gender').value.trim();
+    const age = document.getElementById('age').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!name || !gender || !age || !phone || !address || !password) {
+        alert('All fields are required!');
+        return;
+    }
+
+    try {
+        const res = await fetch('http://localhost:3000/api/patients', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, gender, age, phone, address, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message);
+            window.location.href = 'patient-dashboard.html';
+        } else {
+            if (data.message && data.message.toLowerCase().includes('phone')) {
+                alert('Duplicate phone number not allowed. Please enter a new phone number.');
+            } else {
+                alert('Error: ' + (data.message || 'Registration failed'));
+            }
+            console.error('Server error:', data.error);
+        }
+    } catch (err) {
+        console.error('Fetch error:', err);
+        alert('Registration failed. Check console for details.');
+    }
+});
+</script>
+
+</body>
+</html>

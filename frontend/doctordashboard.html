@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal — AKS Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ===========================
+           AKS Hospital — Premium Theme
+           =========================== */
+        :root {
+            --navy: #1a3236; 
+            --teal: #2d7a75; 
+            --teal-dark: #1f5c58;
+            --gold: #c5a059;
+            
+            --bg-gradient: linear-gradient(135deg, #cfd8dc 0%, #eceff1 100%);
+            --bg-sidebar: linear-gradient(170deg, #122123 0%, #1e4d4a 100%);
+            --bg-card: #ffffff;
+            
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Source Serif 4', serif;
+            --text-main: #263238;
+            --text-muted: #546e7a;
+
+            --shadow-card: 0 4px 15px rgba(0,0,0,0.06);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- UPDATED CINEMATIC LOADER (With Gold Line) --- */
+        #globalLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #152022; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .aks-logo-text {
+            font-family: var(--font-head);
+            font-size: 5rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            gap: 15px;
+        }
+
+        .aks-logo-text span {
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(10px);
+            animation: cinematicReveal 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .aks-logo-text span:nth-child(1) { animation-delay: 0.1s; }
+        .aks-logo-text span:nth-child(2) { animation-delay: 0.3s; color: var(--teal); }
+        .aks-logo-text span:nth-child(3) { animation-delay: 0.5s; }
+
+        /* The Gold Line */
+        .loader-line {
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            margin-top: 10px;
+            animation: lineExpand 1.5s ease forwards 0.6s;
+        }
+
+        @keyframes cinematicReveal { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+        @keyframes lineExpand { to { width: 120px; } }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 270px;
+            background: var(--bg-sidebar);
+            color: #fff;
+            display: flex; flex-direction: column;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+            z-index: 100; flex-shrink: 0;
+        }
+
+        .sidebar-header { padding: 30px 20px; flex-shrink: 0; }
+        .sidebar .brand {
+            font-family: var(--font-head); font-size: 1.8rem; font-weight: 700;
+            display: flex; align-items: center; gap: 10px; color: #fff; 
+        }
+
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 10px 20px; }
+        
+        .nav-section {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; 
+            color: rgba(255,255,255,0.4); margin: 20px 0 8px 5px; font-weight: 600;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px 15px; 
+            border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.8);
+            text-decoration: none; transition: all 0.2s ease; margin-bottom: 5px;
+            font-family: var(--font-body);
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(4px); }
+        .nav-link.active { background: #f0f4f4; color: var(--navy); font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .sidebar-footer {
+            padding: 20px; background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        
+        /* View Containers */
+        #dashboardView, #accountsView {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Dashboard Specific Grid */
+        .dashboard-grid-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 30px;
+        }
+
+        #calendarView {
+            display: none; background: #fff; padding: 20px;
+            border-radius: var(--radius); box-shadow: var(--shadow-card);
+            height: 100%; animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+        
+        /* --- STATS --- */
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--bg-card); padding: 24px; border-radius: var(--radius);
+            box-shadow: var(--shadow-card); display: flex; align-items: center; gap: 15px;
+            border-left: 4px solid var(--teal); transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-info h2 { font-family: var(--font-head); font-size: 1.8rem; color: var(--navy); margin: 0; }
+        .stat-info p { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; }
+
+        /* --- ACCOUNTS SPECIFIC --- */
+        .countdown-container {
+            text-align: center; padding: 40px; background: var(--bg-card); border-radius: var(--radius);
+            box-shadow: var(--shadow-card); margin-bottom: 30px; position: relative; overflow: hidden;
+        }
+        .countdown-container::before {
+            content: ""; position: absolute; top:0; left:0; width: 100%; height: 5px; background: var(--gold);
+        }
+        .countdown-number { font-size: 4rem; font-weight: 700; color: var(--navy); font-family: var(--font-head); }
+        .countdown-label { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; }
+        
+        /* --- TABLES --- */
+        .content-card { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow-card); padding: 25px; margin-bottom: 30px; }
+        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
+        .card-head h3 { font-family: var(--font-head); color: var(--navy); font-size: 1.4rem; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; background: #f8f9fa; font-weight: 700; }
+        td { padding: 15px; border-bottom: 1px solid #eceff1; font-size: 0.95rem; }
+        tr:hover td { background: #f1f8e9; }
+
+        /* --- WIDGETS --- */
+        .widget-card {
+            background: var(--bg-card); border-radius: var(--radius);
+            box-shadow: var(--shadow-card); padding: 20px; margin-bottom: 25px;
+        }
+        .profile-widget { text-align: center; }
+        .profile-img { 
+            width: 80px; height: 80px; background: var(--navy); color: #fff; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 15px; font-family: var(--font-head);
+        }
+        .notif-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        .notif-icon { color: var(--gold); }
+        .notif-text { font-size: 0.85rem; color: #555; }
+        .notif-time { font-size: 0.7rem; color: #999; display: block; margin-top: 3px; }
+
+        /* --- BUTTONS --- */
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-family: var(--font-head); font-weight: 700; font-size: 0.8rem; color: #fff; text-transform: uppercase; }
+        .btn-primary { background: var(--teal); box-shadow: 0 4px 12px rgba(45, 122, 117, 0.3); }
+        .btn-danger { background: #c62828; }
+
+        /* --- CALENDAR STYLING --- */
+        .fc-header-toolbar { margin-bottom: 20px !important; }
+        .fc-toolbar-title { font-family: var(--font-head); font-size: 1.5rem !important; color: var(--navy); }
+        .fc-button { background: var(--teal) !important; border: none !important; font-size: 0.8rem !important; text-transform: uppercase; }
+        .fc-button-active { background: var(--navy) !important; }
+
+        /* --- MODAL --- */
+        .modal { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(26, 50, 54, 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal-box { background: #fff; width: 600px; padding: 30px; border-radius: var(--radius); box-shadow: 0 25px 80px rgba(0,0,0,0.25); animation: zoomIn 0.3s; }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f9fbfb; font-family: var(--font-body); }
+        .tests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 200px; overflow-y: auto; padding: 10px; background: #fafafa; border: 1px solid #eee; border-radius: 8px; }
+        .test-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+
+        @media(max-width: 1100px) { .dashboard-grid-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div id="globalLoader">
+        <div class="aks-logo-text">
+            <span>A</span><span>K</span><span>S</span>
+        </div>
+        <div class="loader-line"></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <span class="material-symbols-outlined" style="font-size:32px; color:#4db6ac">local_hospital</span>
+                <span>AKS Hospital</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="nav-section">Main</div>
+            <a href="#" class="nav-link active" onclick="handleNav(this, 'dashboard')">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+            
+            <div class="nav-section">Events</div>
+            <a href="#" class="nav-link" onclick="handleNav(this, 'calendar')">
+                <span class="material-symbols-outlined">event_note</span> Yearly Calendar
+            </a>
+
+            <div class="nav-section">Personal</div>
+            <a href="#" class="nav-link" onclick="handleNav(this, 'accounts')">
+                <span class="material-symbols-outlined">account_balance_wallet</span> Accounts & Payroll
+            </a>
+
+            <div class="nav-section">System</div>
+            
+            <a href="/" class="nav-link" style="color:#ef9a9a">
+                <span class="material-symbols-outlined">logout</span> Logout
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <p style="opacity:0.8; font-size:0.7rem; text-transform:uppercase; margin-bottom:5px;">Signed In As</p>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="material-symbols-outlined">account_circle</span>
+                <strong id="adminName">Dr. Portal</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="header">
+            <div>
+                <h1 id="welcomeHeader">Welcome back, Doctor</h1>
+                <p style="color:var(--text-muted); font-size:0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle;">schedule</span> 
+                    Last logged in: <span id="lastLoginDisplay">Just now</span>
+                </p>
+            </div>
+            <div style="text-align:right">
+                <h3 style="margin:0; color:var(--navy); font-family:var(--font-head)" id="currentDateDisplay">Loading...</h3>
+            </div>
+        </div>
+
+        <div id="dashboardView" class="dashboard-grid-layout">
+            <div>
+                <div class="grid-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color:var(--navy); font-size:30px;"><span class="material-symbols-outlined">people</span></div>
+                        <div class="stat-info"><h2 id="totalPatientsDisplay">0</h2><p>Total Patients</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:var(--gold)">
+                        <div class="stat-icon" style="color:var(--gold); font-size:30px;"><span class="material-symbols-outlined">pending_actions</span></div>
+                        <div class="stat-info"><h2 id="pendingAppointmentsDisplay">0</h2><p>Pending</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left-color:#e53935">
+                        <div class="stat-icon" style="color:#e53935; font-size:30px;"><span class="material-symbols-outlined">check_circle</span></div>
+                        <div class="stat-info"><h2 id="bookedAppointments">0</h2><p>Booked</p></div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-head">
+                        <h3>Appointments List</h3>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Date/Time</th><th>Patient Name</th><th>Phone</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="appointmentsTableBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="widget-card profile-widget">
+                    <div class="profile-img">Dr</div>
+                    <h3 id="doctorName">Loading...</h3>
+                    <p id="doctorSpeciality">Loading...</p>
+                    <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                        <span style="font-size:0.8rem; color:#888;">ID: <span id="doctorIdDisplay">-</span></span>
+                    </div>
+                </div>
+                <div class="widget-card">
+                    <h4 style="margin-top:0; color:var(--navy); font-family:var(--font-head); border-bottom:2px solid #eee; padding-bottom:10px;">Hospital Notices</h4>
+                    <div class="notif-item"><span class="material-symbols-outlined notif-icon">campaign</span><div><div class="notif-text">ICU Capacity at 80%.</div><span class="notif-time">10 mins ago</span></div></div>
+                    <div class="notif-item"><span class="material-symbols-outlined notif-icon">science</span><div><div class="notif-text">Lab Server Maintenance: 2 AM.</div><span class="notif-time">2 hours ago</span></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="accountsView" style="display:none">
+            <div class="countdown-container">
+                <p class="countdown-label">Next Salary Disbursement In</p>
+                <div class="countdown-number"><span id="daysToSalary">--</span> Days</div>
+                <p style="color:#2d7a75; font-weight:600; margin-top:10px;">Scheduled for the 5th of next month</p>
+            </div>
+
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e0f2f1; color:var(--teal); font-size:30px;"><span class="material-symbols-outlined">payments</span></div>
+                    <div class="stat-info">
+                        <h2>$12,500</h2>
+                        <p>Base Monthly Salary</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left-color:var(--gold)">
+                    <div class="stat-icon" style="background:#fff8e1; color:var(--gold); font-size:30px;"><span class="material-symbols-outlined">star</span></div>
+                    <div class="stat-info">
+                        <h2>$2,400</h2>
+                        <p>Expected Bonus</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left-color:#1a3236">
+                    <div class="stat-icon" style="background:#eceff1; color:var(--navy); font-size:30px;"><span class="material-symbols-outlined">account_balance</span></div>
+                    <div class="stat-info">
+                        <h2>Active</h2>
+                        <p>Direct Deposit Status</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h3>Recent Payouts</h3>
+                <table>
+                    <thead><tr><th>Date</th><th>Reference ID</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>Nov 05, 2025</td><td>TRX-998231</td><td>Salary</td><td>$12,500</td><td><span style="color:green; font-weight:bold">Paid</span></td></tr>
+                        <tr><td>Oct 05, 2025</td><td>TRX-887123</td><td>Salary</td><td>$12,500</td><td><span style="color:green; font-weight:bold">Paid</span></td></tr>
+                        <tr><td>Sep 05, 2025</td><td>TRX-776212</td><td>Salary</td><td>$12,500</td><td><span style="color:green; font-weight:bold">Paid</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="calendarView"><div id='calendar'></div></div>
+
+    </div>
+
+    <div id="prescriptionModal" class="modal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0; font-family:var(--font-head); color:var(--navy)">Prescription</h3>
+                <span class="material-symbols-outlined" style="cursor:pointer" onclick="document.getElementById('prescriptionModal').style.display='none'">close</span>
+            </div>
+            <div style="background:#e0f2f1; padding:15px; border-radius:8px; border-left:4px solid var(--teal); margin-bottom:20px;">
+                <p style="margin:0; font-size:0.9rem;"><strong>Patient:</strong> <span id="modalPatientName"></span></p>
+                <p style="margin:5px 0 0; font-size:0.8rem; color:#555;">ID: <span id="modalAppointmentId"></span> | Phone: <span id="modalPatientPhone"></span></p>
+                <span id="modalDoctorName" style="display:none"></span>
+            </div>
+            <label style="font-weight:bold; color:var(--navy); display:block; margin-bottom:8px;">Clinical Notes / Rx:</label>
+            <textarea id="prescriptionInput" rows="6" placeholder="Type diagnosis, medication, dosage..."></textarea>
+            <div style="margin:15px 0; display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="requestLabCheck" style="width:18px; height:18px; margin:0;">
+                <label for="requestLabCheck" style="font-weight:600; color:var(--navy);">Request Lab Tests?</label>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="submitPrescription()">Submit & Continue</button>
+        </div>
+    </div>
+
+    <div id="labTestRequestModal" class="modal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0; font-family:var(--font-head); color:var(--navy)">Order Lab Tests</h3>
+                <span class="material-symbols-outlined" style="cursor:pointer" onclick="closeModal('labTestRequestModal')">close</span>
+            </div>
+            <p style="margin-bottom:15px; color:var(--text-muted);">Select tests for <strong id="modalPatientName_Lab" style="color:var(--teal)"></strong>:</p>
+            <form id="labTestSelectionForm"><div id="availableLabTests" class="tests-grid">Loading...</div></form>
+            <div style="display:flex; justify-content:space-between; margin-top:20px; gap:15px;">
+                <button class="btn btn-danger" onclick="closeModal('labTestRequestModal')" style="flex:1">Cancel</button>
+                <button class="btn btn-primary" onclick="submitLabOrders()" style="flex:1">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function handleNav(el, view) {
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+
+            ['dashboardView', 'calendarView', 'accountsView'].forEach(id => document.getElementById(id).style.display = 'none');
+
+            if (view === 'dashboard') document.getElementById('dashboardView').style.display = 'grid';
+            if (view === 'accounts') {
+                document.getElementById('accountsView').style.display = 'block';
+                calculateDaysToSalary();
+            }
+            if (view === 'calendar') {
+                document.getElementById('calendarView').style.display = 'block';
+                setTimeout(() => calendar.render(), 100);
+            }
+        }
+
+        // --- SALARY COUNTER LOGIC ---
+        function calculateDaysToSalary() {
+            const today = new Date();
+            let year = today.getFullYear();
+            let month = today.getMonth();
+            
+            // Salary is on the 5th
+            let payDate = new Date(year, month, 5);
+
+            // If today is past the 5th, pay date is next month
+            if (today.getDate() > 5) {
+                if (month === 11) { month = 0; year++; } else { month++; }
+                payDate = new Date(year, month, 5);
+            }
+
+            const diffTime = Math.abs(payDate - today);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            document.getElementById('daysToSalary').innerText = diffDays;
+        }
+
+        // --- CALENDAR SETUP ---
+        var calendar;
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listYear' },
+                height: 'auto',
+                events: [
+                    { title: 'New Year', date: '2025-01-01', color: '#1a3236' },
+                    { title: 'Kashmir Day', date: '2025-02-05', color: '#2d7a75' },
+                    { title: 'Pakistan Day', date: '2025-03-23', color: '#2d7a75' },
+                    { title: 'Independence Day', date: '2025-08-14', color: '#2d7a75' },
+                    { title: 'Annual Staff Dinner', date: '2025-12-20', color: '#c5a059' }
+                ]
+            });
+            calendar.render();
+        });
+
+        // --- DASHBOARD LOGIC ---
+        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Simulating last login
+        const lastLogin = new Date();
+        lastLogin.setMinutes(lastLogin.getMinutes() - Math.floor(Math.random() * 60));
+        document.getElementById('lastLoginDisplay').innerText = lastLogin.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+        const BASE_URL = 'http://localhost:3000/api';
+        let currentAppointment = {};
+        let allLabServices = [];
+        let diagnosisCache = '';
+
+        // UPDATED LOADER TIMEOUT (to match new animation duration)
+        window.addEventListener('load', () => {
+            setTimeout(() => { 
+                const loader = document.getElementById('globalLoader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 800);
+            }, 1800); // 1.8s delay to let the gold line expand
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const doctorId = localStorage.getItem('doctorId');
+            const doctorName = localStorage.getItem('doctorName');
+            const doctorSpecialization = localStorage.getItem('doctorSpecialization');
+
+            if (!doctorId) {
+                alert('Session expired. Please log in.');
+                window.location.href = 'login page.html';
+                return;
+            }
+
+            // WELCOME HEADER UPDATE
+            document.getElementById('welcomeHeader').innerText = `Welcome back, ${doctorName || 'Doctor'}`;
+            document.getElementById('doctorName').innerText = (doctorName || 'Doctor');
+            document.getElementById('doctorSpeciality').innerText = (doctorSpecialization || 'General');
+            document.getElementById('doctorIdDisplay').innerText = doctorId;
+            
+            loadDoctorAppointments(doctorId);
+            fetchLabServices();
+        });
+
+        async function loadDoctorAppointments(doctorId) {
+            try {
+                const res = await fetch(`${BASE_URL}/appointments/doctor/${doctorId}`);
+                if (!res.ok) throw new Error('Network error');
+                const appointments = await res.json();
+                renderAppointments(appointments);
+            } catch (error) { console.error(error); }
+        }
+
+        function renderAppointments(appointments) {
+            const tableBody = document.getElementById('appointmentsTableBody');
+            tableBody.innerHTML = '';
+            
+            const total = appointments.length;
+            const pending = appointments.filter(a => a.status === 'Pending').length;
+            const booked = appointments.filter(a => a.status === 'Approved').length;
+
+            document.getElementById('totalPatientsDisplay').innerText = total;
+            document.getElementById('pendingAppointmentsDisplay').innerText = pending;
+            document.getElementById('bookedAppointments').innerText = booked;
+
+            if (appointments.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center">No appointments found.</td></tr>';
+                return;
+            }
+
+            appointments.forEach(a => {
+                const date = new Date(a.date).toLocaleDateString() + ' ' + new Date(a.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                let actionBtn = '';
+                let statusColor = 'color:#555';
+
+                if (a.status.toLowerCase() === 'pending') {
+                    statusColor = 'color:#f57f17; font-weight:bold';
+                    actionBtn = `<button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem" onclick="updateStatus(${a.appointment_id}, 'Approved')">Approve</button>
+                                 <button class="btn btn-danger" style="padding:5px 10px; font-size:0.7rem; margin-left:5px" onclick="updateStatus(${a.appointment_id}, 'Cancelled')">Cancel</button>`;
+                } else if (a.status.toLowerCase() === 'approved') {
+                    statusColor = 'color:var(--teal); font-weight:bold';
+                    actionBtn = `<button class="btn btn-primary" onclick="openPrescriptionModal(${JSON.stringify(a).replace(/"/g, '&quot;')})">Prescribe</button>`;
+                } else {
+                    actionBtn = '<span style="color:#aaa">Closed</span>';
+                }
+
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${date}</td>
+                        <td><strong>${a.patientName}</strong></td>
+                        <td>${a.phone}</td>
+                        <td>${a.notes || '-'}</td>
+                        <td style="${statusColor}">${a.status}</td>
+                        <td>${actionBtn}</td>
+                    </tr>`;
+            });
+        }
+
+        async function updateStatus(id, status) {
+            if(!confirm(`Update status to ${status}?`)) return;
+            await fetch(`${BASE_URL}/appointments/${id}/status`, {
+                method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ status })
+            });
+            loadDoctorAppointments(localStorage.getItem('doctorId'));
+        }
+
+        function openPrescriptionModal(app) {
+            currentAppointment = app;
+            diagnosisCache = '';
+            document.getElementById('modalPatientName').innerText = app.patientName;
+            document.getElementById('modalPatientPhone').innerText = app.phone;
+            document.getElementById('modalAppointmentId').innerText = app.appointment_id;
+            document.getElementById('prescriptionInput').value = '';
+            document.getElementById('requestLabCheck').checked = false;
+            document.getElementById('prescriptionModal').style.display = 'flex';
+        }
+
+        async function submitPrescription() {
+            const notes = document.getElementById('prescriptionInput').value;
+            const reqLab = document.getElementById('requestLabCheck').checked;
+            if(notes.length < 3) return alert('Please enter clinical notes.');
+            diagnosisCache = notes;
+            if(reqLab) {
+                document.getElementById('prescriptionModal').style.display = 'none';
+                openLabTestModal();
+            } else {
+                await finalizeEncounter([]);
+            }
+        }
+
+        function openLabTestModal() {
+            document.getElementById('modalPatientName_Lab').innerText = currentAppointment.patientName;
+            const div = document.getElementById('availableLabTests');
+            div.innerHTML = '';
+            if(allLabServices.length === 0) div.innerHTML = 'No tests available.';
+            allLabServices.forEach(s => {
+                div.innerHTML += `<div class="test-item"><input type="checkbox" name="testId" value="${s.service_id}" data-doc="${s.document_link || ''}"><label>${s.service_name} ($${s.fee})</label></div>`;
+            });
+            document.getElementById('labTestRequestModal').style.display = 'flex';
+        }
+
+        async function submitLabOrders() {
+            const checks = document.querySelectorAll('input[name="testId"]:checked');
+            const tests = Array.from(checks).map(cb => ({
+                test_id: parseInt(cb.value),
+                test_name: cb.nextElementSibling.innerText.split(' ($')[0],
+                document_link: cb.dataset.doc
+            }));
+            await finalizeEncounter(tests);
+        }
+
+        async function finalizeEncounter(tests) {
+            const payload = {
+                appointmentId: currentAppointment.appointment_id,
+                doctor_id: localStorage.getItem('doctorId'),
+                patient_id: currentAppointment.patient_id,
+                patientName: currentAppointment.patientName,
+                diagnosis: diagnosisCache,
+                tests: tests
+            };
+            const res = await fetch(`${BASE_URL}/laborders/submit`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            });
+            if(res.ok) {
+                alert('Encounter Saved & Bill Generated.');
+                location.reload();
+            } else {
+                alert('Error saving data.');
+            }
+        }
+
+        async function fetchLabServices() {
+            const res = await fetch(`${BASE_URL}/services`);
+            const data = await res.json();
+            allLabServices = data.filter(s => s.service_type === 'Lab' || s.service_type === 'Test');
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    </script>
+</body>
+</html>

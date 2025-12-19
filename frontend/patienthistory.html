@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History - AKS Hospital Admin</title>
+    
+    <style>
+        /* Base styles inherited from admindashboard.html for consistency */
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa; 
+            line-height: 1.5;
+            padding: 20px;
+        }
+        .header {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #085950;
+        }
+        .header h1 {
+            color: #2F4050;
+            font-size: 1.7em;
+            font-weight: 300;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+        .section h2 {
+            color: #085950; /* Primary color */
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            font-size: 1.5em;
+            font-weight: 400;
+        }
+
+        /* Details Grid */
+        #patientDetails p {
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        #patientDetails strong {
+            display: inline-block;
+            width: 150px;
+            color: #6c757d;
+        }
+
+        /* History Tables */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f1f1f1;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .history-table th {
+            background-color: #f8f9fa;
+            color: #2F4050;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .history-table tbody tr:hover {
+            background-color: #fcfcfc;
+        }
+        
+        /* Status Badge for consistency */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: white;
+            font-weight: bold;
+        }
+        .status-completed { background-color: #5cb85c; }
+        .status-approved { background-color: #337ab7; }
+        .status-pending { background-color: #f0ad4e; }
+        .status-cancelled { background-color: #d9534f; }
+
+        .back-button {
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="admindashboard.html#patients" class="back-button">← Back to Patient Records</a>
+
+        <div class="header">
+            <h1 id="pageTitle">Patient Medical History</h1>
+        </div>
+
+        <div class="section">
+            <h2>Patient Details</h2>
+            <div id="patientDetails">
+                <p>Loading patient data...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Appointment History</h2>
+            <div id="appointmentHistory">
+                <p>Loading appointment history...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Prescription and Diagnosis Records</h2>
+            <div id="prescriptionRecords">
+                <p>Loading prescription records...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3000/api'; 
+        let currentPatientId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Get Patient ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPatientId = urlParams.get('patientId');
+            
+            if (!currentPatientId) {
+                document.getElementById('patientDetails').innerHTML = 
+                    `<p style="color:red;">Error: No Patient ID found in the URL. Cannot load history.</p>`;
+                document.getElementById('pageTitle').innerText = 'Patient Medical History (Error)';
+                return;
+            }
+
+            // 2. Load all data
+            fetchPatientDetails(currentPatientId);
+            fetchAppointmentHistory(currentPatientId);
+            fetchPrescriptionRecords(currentPatientId);
+        });
+
+        // =======================================================
+        // DATA FETCHING FUNCTIONS
+        // =======================================================
+
+        /**
+         * Fetches basic patient demographic details.
+         */
+        async function fetchPatientDetails(patientId) {
+            const container = document.getElementById('patientDetails');
+            try {
+                // *** NOTE: Requires GET /api/admin/patients/:id ***
+                const res = await fetch(`${BASE_URL}/admin/patients/${patientId}`);
+                if (!res.ok) throw new Error(`Status: ${res.status}`);
+                
+                const patient = await res.json();
+
+                document.getElementById('pageTitle').innerText = `Patient Medical History: ${patient.name || 'N/A'}`;
+                
+                container.innerHTML = `
+                    <p><strong>Patient ID:</strong> ${patient.patient_id}</p>
+                    <p><strong>Name:</strong> ${patient.name}</p>
+                    <p><strong>Date of Birth:</strong> ${patient.dob || 'N/A'}</p>
+                    <p><strong>Age:</strong> ${patient.age || 'N/A'}</p>
+                    <p><strong>Gender:</strong> ${patient.gender || 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${patient.phone || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${patient.email || 'N/A'}</p>
+                    <p><strong>Address:</strong> ${patient.address || 'N/A'}</p>
+                    <p><strong>Registered Date:</strong> ${patient.registered_date ? new Date(patient.registered_date).toLocaleDateString() : 'N/A'}</p>
+                `;
+            } catch (error) {
+                console.error('Error fetching patient details:', error);
+                container.innerHTML = `<p style="color:red;">Error loading patient details. Check server connection. (${error.message})</p>`;
+            }
+        }
+        
+        /**
+         * Fetches all past and current appointments for the patient.
+         */
+        async function fetchAppointmentHistory(patientId) {
+            const container = document.getElementById('appointmentHistory');
+            try {
+                // *** NOTE: Requires GET /api/admin/patients/:id/appointments ***
+                const res = await fetch(`${BASE_URL}/admin/patients/${patientId}/appointments`);
+                if (!res.ok) throw new Error(`Status: ${res.status}`);
+                
+                const appointments = await res.json();
+
+                if (!appointments || appointments.length === 0) {
+                    container.innerHTML = `<p>No appointment history found for this patient.</p>`;
+                    return;
+                }
+                
+                let html = `<table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Appt ID</th>
+                                        <th>Date</th>
+                                        <th>Doctor</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+                appointments.forEach(appt => {
+                    const statusClass = `status-${appt.status.toLowerCase()}`;
+                    html += `<tr>
+                                <td>${appt.appointment_id}</td>
+                                <td>${new Date(appt.date).toLocaleDateString()}</td>
+                                <td>Dr. ${appt.doctorName || 'N/A'}</td>
+                                <td>${appt.reason || 'N/A'}</td>
+                                <td><span class="status-badge ${statusClass}">${appt.status}</span></td>
+                            </tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error fetching appointment history:', error);
+                container.innerHTML = `<p style="color:red;">Error loading appointment history. Check server connection. (${error.message})</p>`;
+            }
+        }
+
+        /**
+         * Fetches all prescriptions and diagnoses issued to the patient.
+         */
+        async function fetchPrescriptionRecords(patientId) {
+            const container = document.getElementById('prescriptionRecords');
+            try {
+                // *** NOTE: Requires GET /api/admin/patients/:id/prescriptions ***
+                const res = await fetch(`${BASE_URL}/admin/patients/${patientId}/prescriptions`);
+                if (!res.ok) throw new Error(`Status: ${res.status}`);
+                
+                const records = await res.json();
+
+                if (!records || records.length === 0) {
+                    container.innerHTML = `<p>No prescription or diagnosis records found.</p>`;
+                    return;
+                }
+
+                let html = `<table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Doctor</th>
+                                        <th>Diagnosis</th>
+                                        <th>Prescription Details</th>
+                                        <th>Lab Orders</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+                records.forEach(rec => {
+                    const date = new Date(rec.record_date).toLocaleDateString();
+                    const prescriptionText = rec.prescription_details 
+                        ? rec.prescription_details.replace(/\n/g, '<br>') 
+                        : 'No prescription given';
+
+                    const labOrders = rec.lab_orders && rec.lab_orders.length > 0 
+                        ? rec.lab_orders.map(order => order.test_name).join(', ') 
+                        : 'None';
+                        
+                    html += `<tr>
+                                <td>${date}</td>
+                                <td>Dr. ${rec.doctorName || 'N/A'}</td>
+                                <td>${rec.diagnosis || 'N/A'}</td>
+                                <td>${prescriptionText}</td>
+                                <td>${labOrders}</td>
+                            </tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error fetching prescription records:', error);
+                container.innerHTML = `<p style="color:red;">Error loading prescription records. Check server connection. (${error.message})</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
